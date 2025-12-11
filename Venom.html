@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VENOM CURSED — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#000;
+      --panel: rgba(255,255,255,0.03);
+      --glass: rgba(255,255,255,0.04);
+      --neon:#00bfff;
+      --accent:#ff8c00;
+      --muted: rgba(255,255,255,0.6);
+      --maxw: 1000px;
+      --success: #14c77a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: 'Orbitron', sans-serif;
+      background:var(--bg);
+      color:#fff;
+      display:flex;
+      justify-content:center;
+      padding:18px;
+      -webkit-font-smoothing:antialiased;
+    }
+    .container{width:100%;max-width:var(--maxw);display:flex;gap:18px;flex-direction:column;align-items:center}
+
+    header{width:100%;display:flex;align-items:center;gap:12px}
+    .hambtn{
+      width:46px;height:46px;border-radius:10px;display:grid;place-items:center;background:transparent;
+      border:1px solid rgba(255,255,255,0.06);cursor:pointer;font-size:20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      position:relative; overflow:hidden;
+    }
+    .hambtn .lines{width:22px;height:16px;position:relative;}
+    .hambtn .lines span{
+      position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon), rgba(0,191,255,0.6));
+      transition:transform .28s ease, opacity .18s ease;border-radius:2px;
+    }
+    .hambtn .lines span:nth-child(1){top:0}
+    .hambtn .lines span:nth-child(2){top:7px}
+    .hambtn .lines span:nth-child(3){top:14px}
+    .hambtn.open .lines span:nth-child(1){transform: translateY(7px) rotate(45deg)}
+    .hambtn.open .lines span:nth-child(2){opacity:0}
+    .hambtn.open .lines span:nth-child(3){transform: translateY(-7px) rotate(-45deg)}
+    h1{color:var(--neon);margin:0;font-size:1.4rem}
+
+    .card{
+      width:100%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+    }
+
+    .logo{display:flex;flex-direction:column;align-items:center;gap:12px}
+    .logo img{
+      width:220px;border-radius:8px;box-shadow:0 0 30px rgba(0,191,255,0.12);
+      object-fit:cover;
+    }
+    .venom-title{color:var(--neon);letter-spacing:2px;font-size:1.1rem}
+
+    .info{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+    .row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:var(--panel);border:1px solid rgba(255,255,255,0.03)}
+    .label{color:var(--neon)}
+    .value{color:#fff}
+
+    .stats{display:flex;flex-direction:column;align-items:center;margin-top:18px}
+    .stat-box{padding:18px;border-radius:12px;background:rgba(255,255,255,0.02);width:100%;max-width:420px;text-align:center;border:1px solid rgba(255,255,255,0.03)}
+    .stat-big{color:var(--neon);font-size:1.05rem}
+
+    .overlay{position:fixed; inset:0; display:none; background:linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.6)); overflow:hidden;}
+    .menu-wrap{
+      position:fixed; left:0; top:0; bottom:0; width:360px; max-width:86%;
+      transform: translateX(-108%); transition: transform .32s cubic-bezier(.2,.9,.3,1);
+      display:flex; flex-direction:column; padding:20px; gap:12px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.95));
+      box-shadow: 10px 0 40px rgba(0,0,0,0.85); border-right:1px solid rgba(255,255,255,0.03);
+    }
+    .overlay.open .menu-wrap{transform: translateX(0%)}
+    .menu .profile video{width:72px;height:72px;border-radius:8px;object-fit:cover;box-shadow:0 0 15px rgba(0,191,255,0.15);}
+    .menu .items{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .menu .item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;cursor:pointer}
+    .menu .item:hover{background:rgba(255,255,255,0.02)}
+    .menu .footer{margin-top:auto;border-top:1px solid rgba(255,255,255,0.03);padding-top:12px;font-size:0.85rem;opacity:0.9}
+
+    .pages{width:100%;display:flex;gap:18px;flex-direction:column;align-items:center}
+    .page{width:100%;display:none;flex-direction:column;gap:12px}
+    .page.active{display:flex}
+
+    /* attack UI */
+    .attack-panel{display:flex;flex-direction:column;gap:12px}
+    .avatar{width:140px;height:140px;border-radius:50%;overflow:hidden;margin:0 auto}
+    .avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+    .neon-header{text-align:center;color:var(--neon);text-shadow:0 0 10px rgba(0,191,255,0.6)}
+    .form-group{background:var(--glass);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+    input[type="text"], select, textarea{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:#fff;font-family:inherit;font-size:0.95rem;outline:none;}
+    .bug-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+    .bug-card{padding:12px;border-radius:10px;background:var(--panel);cursor:pointer;border:1px solid rgba(255,255,255,0.03);text-align:center}
+    .bug-card.selected{box-shadow:0 10px 30px rgba(0,0,0,0.6),0 0 18px rgba(0,191,255,0.12);border-color:var(--neon)}
+    .options{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);cursor:pointer;font-size:0.9rem}
+    .chip.active{background:linear-gradient(90deg, rgba(0,191,255,0.08), rgba(0,191,255,0.02));border-color:var(--neon)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 16px;border-radius:12px;background:#fff;color:#000;font-weight:700;text-align:center;cursor:pointer;margin-top:8px;width:100%}
+    .btn[disabled]{opacity:0.55;cursor:not-allowed}
+    .btn.success{background: linear-gradient(90deg,var(--success), #0fb06a); color:#052b1f; box-shadow:0 8px 30px rgba(20,199,122,0.12)}
+    .success-icon{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.06);font-weight:800;color:var(--success)}
+    .muted{color:var(--muted);font-size:0.9rem}
+
+    .placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;border-radius:12px;border:1px dashed rgba(255,255,255,0.04);background:rgba(255,255,255,0.01)}
+    @media(min-width:900px){ .logo img{width:260px} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <button class="hambtn" id="hambtn" aria-label="Open menu" title="Menu">
+        <div class="lines"><span></span><span></span><span></span></div>
+      </button>
+      <h1>VENOM CURSED</h1>
+      <div style="flex:1"></div>
+      <button class="hambtn" id="loginBtn" title="Login">
+        <div style="width:22px;text-align:center">🔐</div>
+      </button>
+    </header>
+
+    <!-- DASHBOARD (still jpg) -->
+    <section class="card page active" id="dashboardPage">
+      <div class="logo">
+        <!-- DASHBOARD tetap gambar -->
+        <img id="logoImg" src="https://files.catbox.moe/arpz45.png" alt="logo">
+        <div class="venom-title">VENOM CURSED</div>
+      </div>
+
+      <div class="info" id="profileInfo">
+        <div class="row"><div class="label">Username:</div><div class="value" id="usernameVal">******</div></div>
+        <div class="row"><div class="label">Password:</div><div class="value" id="passwordVal">******</div></div>
+        <div class="row"><div class="label">
+          <div>expired</div><div class="value" id=expired></div
+           </div><class="row"><div class="label"></div>2053-7-25
+        </div>
+      </div>
+    </section>
+
+    <!-- ATTACK PAGE (UI-ONLY) - still jpg for avatar -->
+    <section class="card page" id="attackPage" aria-hidden="true">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="hambtn" id="backFromAttack" title="Back">←</button>
+        <div style="flex:1"></div>
+      </div>
+
+      <div class="attack-panel">
+        <div class="avatar">
+          <!-- ATTACK still image -->
+          <img id="avatarImg" src="https://files.catbox.moe/arpz45.png" alt="avatar">
+        </div>
+
+        <div class="neon-header">Select Target & Bug Whatsap</div>
+
+        <div class="form-group">
+          <label class="muted">Target number (e.g. +62 812xxxx)</label>
+          <input type="text" id="targetInput" placeholder="+62 812xxxx" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label class="muted">Duration (seconds)</label>
+          <input type="text" id="durationInput" placeholder="e.g. 30" inputmode="numeric">
+        </div>
+        <div class="form-group">
+          <label class="muted">Choose Bug</label>
+          <div class="bug-list" id="bugList">
+            <div class="bug-card" data-key="DelayHard">Hard Delay Invisible</div>
+            <div class="bug-card" data-key="Invisible">Venom Invis</div>
+            <div class="bug-card" data-key="notif_spam">Venom SpamCall</div>
+            <div class="bug-card" data-key="BlankAndros">Venom Blank</div>
+          </div>
+        </div>
+          <!-- Send button will show green check on success -->
+          <button class="btn" id="sendBtn"><span id="sendBtnText">▶ SEND BUG</span></button>
+        </div>
+
+        <div style="margin-top:6px">
+          <div class="muted">Status: <span id="taskStatus">Idle</span></div>
+          <pre id="simulateOutput" style="margin-top:8px;color:#ddd;max-height:180px;overflow:auto;padding:8px;background:rgba(0,0,0,0.25);border-radius:8px;font-size:0.9rem"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESELLER PAGE -->
+    <section class="card page" id="resellerPage" aria-hidden="true">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="hambtn" id="backFromReseller" title="Back">←</button>
+        <div style="flex:1"></div>
+      </div>
+      <div class="placeholder">
+        <h3>Reseller Account — Coming Soon</h3>
+        <p class="muted"></p>
+      </div>
+    </section>
+
+    <!-- ADMIN PAGE -->
+    <section class="card page" id="adminPage" aria-hidden="true">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="hambtn" id="backFromAdmin" title="Back">←</button>
+        <div style="flex:1"></div>
+      </div>
+      <div class="placeholder">
+        <h3>Control Admin — Coming Soon</h3>
+        <p class="muted"></p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Overlay menu (with video only here) -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="menu-wrap" role="dialog" aria-modal="true" aria-label="Main menu">
+      <div class="menu" id="menuBox">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700">Venom Cursed</div>
+          <div id="closeMenu" style="cursor:pointer">✕</div>
+        </div>
+
+        <div class="profile" style="margin-top:12px;display:flex;gap:12px;align-items:center">
+          <!-- VIDEO only in hamburger/profile -->
+          <video id="menuVideo" src="https://files.catbox.moe/qfmlqy.mp4" autoplay muted loop playsinline></video>
+          <div>
+            <div id="menuUser" style="font-weight:700">Guest</div>
+            <div class="muted" id="menuRole">—</div>
+          </div>
+        </div>
+
+        <div class="items" id="menuItems">
+          <div class="item" data-id="myinfo">🏠 Dashboard</div>
+          <div class="item" data-id="attack">📞 Attack</div>
+          <div class="item" data-id="reseller">🛒 Reseller Account</div>
+          <div class="item" data-id="admin">⚙ Control Admin</div>
+          <div class="item" data-id="logout">📤 Logout</div>
+        </div>
+
+        <div class="footer">Developer: @GaxIsHere25</div>
+        Information: @VenomJs25x
+      </div>
+    </div>
+  </div>
+
+<script>
+/*
+  SAFE NOTES:
+  - UI connects to backend ONLY for login & profile:
+    POST /api/login  -> { token, user }
+    GET  /api/profile -> { user }
+  - Attack actions 
+  - Behavior per request:
+    * MP4 is only in the hamburger/profile (menuVideo).
+    * Dashboard & Attack use image (logoImg, avatarImg).
+    * On SEND BUG: alert('bacan') -> show green check + "Successful" -> disable for 10s.
+    * During cooldown clicking SEND shows alert('bacan') and does nothing.
+*/
+
+const API_BASE = window.location.origin + '/api/'; // adjust if needed
+
+/* DOM refs */
+const overlay = document.getElementById('overlay');
+const hambtn = document.getElementById('hambtn');
+const closeMenu = document.getElementById('closeMenu');
+const menuItems = document.getElementById('menuItems');
+
+const pages = {
+  dashboard: document.getElementById('dashboardPage'),
+  attack: document.getElementById('attackPage'),
+  reseller: document.getElementById('resellerPage'),
+  admin: document.getElementById('adminPage'),
+};
+
+const usernameVal = document.getElementById('usernameVal');
+const passwordVal = document.getElementById('passwordVal');
+const roleVal = document.getElementById('roleVal');
+const ownerVal = document.getElementById('ownerVal');
+const expiredVal = document.getElementById('expiredVal');
+const daysRemain = document.getElementById('daysRemain');
+
+const menuUser = document.getElementById('menuUser');
+const menuRole = document.getElementById('menuRole');
+
+const loginBtn = document.getElementById('loginBtn');
+
+const targetInput = document.getElementById('targetInput');
+const durationInput = document.getElementById('durationInput');
+const bugCards = document.querySelectorAll('.bug-card');
+const chips = document.querySelectorAll('.chip');
+const sendBtn = document.getElementById('sendBtn');
+const sendBtnText = document.getElementById('sendBtnText');
+const taskStatus = document.getElementById('taskStatus');
+const simulateOutput = document.getElementById('simulateOutput');
+
+let token = localStorage.getItem('venom_token') || null;
+let selectedBug = null;
+let selectedOptions = new Set();
+let cooldownActive = false;
+let cooldownTimer = null;
+
+/* menu open/close */
+function openMenu(){
+  overlay.style.display = 'block';
+  setTimeout(()=> overlay.classList.add('open'), 10);
+  hambtn.classList.add('open');
+  refreshProfile();
+}
+function closeMenuFn(){
+  overlay.classList.remove('open');
+  hambtn.classList.remove('open');
+  setTimeout(()=> overlay.style.display = 'none', 320);
+}
+hambtn.addEventListener('click', ()=> overlay.classList.contains('open') ? closeMenuFn() : openMenu());
+closeMenu.addEventListener('click', closeMenuFn);
+document.addEventListener('keydown', (e)=> { if (e.key === 'Escape') closeMenuFn(); });
+
+/* page navigation */
+menuItems.addEventListener('click', (e)=>{
+  const item = e.target.closest('.item');
+  if (!item) return;
+  const id = item.dataset.id;
+  closeMenuFn();
+  switch(id){
+    case 'myinfo': showPage('dashboard'); break;
+    case 'attack': showPage('attack'); break;
+    case 'reseller': showPage('reseller'); break;
+    case 'admin': showPage('admin'); break;
+    case 'logout': doLogout(); break;
+  }
+});
+function showPage(key){
+  Object.values(pages).forEach(p=>p.classList.remove('active'));
+  if (pages[key]) pages[key].classList.add('active');
+  Object.entries(pages).forEach(([k,el]) => el.setAttribute('aria-hidden', el.classList.contains('active') ? 'false' : 'true'));
+}
+
+/* login flow */
+loginBtn.addEventListener('click', async ()=>{
+  const u = prompt('Username:');
+  if (!u) return;
+  const p = prompt('Password:');
+  if (!p) return;
+  try {
+    const res = await fetch(API_BASE + 'login', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ username:u, password:p })
+    });
+    const j = await res.json();
+    if (!res.ok) { alert(j.error || 'Login gagal'); return; }
+    token = j.token;
+    localStorage.setItem('venom_token', token);
+    await refreshProfile();
+    alert('Login berhasil: ' + (j.user && j.user.username ? j.user.username : 'user'));
+  } catch(e){ alert('Network error: ' + e.message); }
+});
+
+/* refresh profile (username, role, owner, expired) */
+async function refreshProfile(){
+  if (!token){
+    usernameVal.textContent = 'Guest'; passwordVal.textContent = '******'; roleVal.textContent = '-'; ownerVal.textContent = '-'; expiredVal.textContent = '-';
+    menuUser.textContent = 'Guest'; menuRole.textContent = '-'; daysRemain.textContent = '— days remaining';
+    return;
+  }
+  try {
+    const res = await fetch(API_BASE + 'profile', { headers: { 'Authorization': 'Bearer ' + token }});
+    if (!res.ok) { localStorage.removeItem('venom_token'); token = null; return refreshProfile(); }
+    const j = await res.json();
+    const u = j.user || {};
+    usernameVal.textContent = u.username || '—';
+    passwordVal.textContent = '******';
+    roleVal.textContent = u.role || '-';
+    ownerVal.textContent = u.owner || (u.is_owner ? 'Yes' : '-') || '-';
+    expiredVal.textContent = u.expires_at || '-';
+    menuUser.textContent = u.display_name || u.username || 'Guest';
+    menuRole.textContent = u.role || '-';
+    if (u.expires_at){
+      const ex = new Date(u.expires_at);
+      const now = new Date();
+      const diff = Math.max(0, Math.ceil((ex - now) / (1000*60*60*24)));
+      daysRemain.textContent = diff + ' days remaining';
+    } else {
+      daysRemain.textContent = '— days remaining';
+    }
+  } catch(e){
+    console.warn('profile error', e);
+    token = null; localStorage.removeItem('venom_token');
+  }
+}
+
+/* logout */
+function doLogout(){
+  token = null; localStorage.removeItem('venom_token'); refreshProfile(); alert('Logged out'); showPage('dashboard');
+}
+
+/* attack UI interactions */
+bugCards.forEach(card=>{
+  card.addEventListener('click', ()=>{
+    bugCards.forEach(c=>c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedBug = card.dataset.key || null;
+    updateAttackPreview();
+  });
+});
+
+chips.forEach(ch=>{
+  ch.addEventListener('click', ()=>{
+    const k = ch.dataset.opt;
+    if (selectedOptions.has(k)) { selectedOptions.delete(k); ch.classList.remove('active'); }
+    else { selectedOptions.add(k); ch.classList.add('active'); }
+    updateAttackPreview();
+  });
+});
+
+function updateAttackPreview(){
+  const t = (targetInput && targetInput.value.trim()) || '[no target]';
+  const d = (durationInput && durationInput.value.trim()) || '[no duration]';
+  const bug = selectedBug || '[no bug selected]';
+  const opts = [...selectedOptions].join(', ') || '[no options]';
+  taskStatus.textContent = `Preview: ${bug} → ${t} (${d}s) [${opts}]`;
+}
+
+/* cooldown logic */
+function startCooldown(seconds){
+  if (cooldownActive) return;
+  cooldownActive = true;
+  sendBtn.setAttribute('disabled','');
+  targetInput.setAttribute('disabled','');
+  durationInput.setAttribute('disabled','');
+  chips.forEach(c=>c.setAttribute('disabled',''));
+  bugCards.forEach(c=>c.setAttribute('disabled',''));
+  let s = Math.max(0, Math.floor(seconds));
+  // show bacan text while waiting
+  taskStatus.textContent = `bacan — wait ${s}s`;
+  // update button style back later
+  const originalText = sendBtnText.textContent;
+  // clear any previous timer
+  if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null; }
+  cooldownTimer = setInterval(()=>{
+    s -= 1;
+    if (s <= 0){
+      clearInterval(cooldownTimer);
+      cooldownTimer = null;
+      cooldownActive = false;
+      sendBtn.removeAttribute('disabled');
+      targetInput.removeAttribute('disabled');
+      durationInput.removeAttribute('disabled');
+      chips.forEach(c=>c.removeAttribute('disabled'));
+      bugCards.forEach(c=>c.removeAttribute('disabled'));
+      // reset button appearance
+      sendBtn.classList.remove('success');
+      sendBtnText.textContent = '▶ SEND BUG';
+      taskStatus.textContent = 'Ready';
+    } else {
+      taskStatus.textContent = `bacan — wait ${s}s`;
+    }
+  }, 1000);
+}
+
+/* Send button handling: alert('bacan'), success mark, 10s cooldown */
+sendBtn.addEventListener('click', ()=>{
+  if (cooldownActive){
+    // If user tries during cooldown: show 'bacan' alert and do nothing.
+    alert('bacan');
+    return;
+  }
+
+  const target = targetInput.value.trim();
+  const duration = durationInput.value.trim();
+  if (!target) { alert('Isi target dulu'); return; }
+  if (!duration || isNaN(Number(duration)) ) { alert('Isi durasi valid dalam detik'); return; }
+  if (!selectedBug) { alert('Pilih bug dulu'); return; }
+
+  // Per request: show 'bacan' alert on click send
+  alert('bacan');
+
+  // show green check + "Successful"
+  sendBtn.classList.add('success');
+  sendBtnText.textContent = '✓ Successful';
+
+  // display simulation summary in UI (no backend call)
+  const summary = {
+    type: 'SIMULATION',
+    user: usernameVal.textContent || 'Guest',
+    target,
+    duration: Number(duration),
+    bug: selectedBug,
+    options: [...selectedOptions],
+    timestamp: new Date().toISOString()
+  };
+  simulateOutput.textContent = JSON.stringify(summary, null, 2);
+  taskStatus.textContent = 'Successful';
+
+  // start enforced cooldown 10s
+  startCooldown(10);
+
+  // clear fields & selections (safe)
+  targetInput.value = '';
+  durationInput.value = '';
+  bugCards.forEach(c=>c.classList.remove('selected'));
+  selectedBug = null;
+  selectedOptions.clear();
+  chips.forEach(c=>c.classList.remove('active'));
+});
+
+/* back buttons */
+document.getElementById('backFromAttack').addEventListener('click', ()=> showPage('dashboard'));
+document.getElementById('backFromReseller').addEventListener('click', ()=> showPage('dashboard'));
+document.getElementById('backFromAdmin').addEventListener('click', ()=> showPage('dashboard'));
+
+/* initial */
+showPage('dashboard');
+refreshProfile();
+// ensure menu video plays
+document.querySelectorAll('video').forEach(v => v.play().catch(()=>{}));
+</script>
+</body>
+</html>

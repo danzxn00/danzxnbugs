@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Venom Cursed</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display.swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* ======================================= */
+    /* LIQUID GLASS THEME VARIABLES */
+    /* ======================================= */
+    :root {
+      --body-bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Default clean background */
+      --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      --primary-gradient-hover: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
+      --primary-blue: #007AFF;
+      --text-dark: #1D1D1F;
+      --text-light: #555;
+      
+      /* Liquid Glass Card specific */
+      --glass-card-bg: rgba(255, 255, 255, 0.1); 
+      --glass-card-border: 1px solid rgba(255, 255, 255, 0.3);
+      --glass-card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+      --glass-card-radius: 24px;
+      --glass-card-blur: 15px; /* Added blur for card background */
+
+      --input-bg: rgba(255, 255, 255, 0.4);
+      --input-border: 1px solid rgba(255, 255, 255, 0.5);
+
+      /* ✅ NEW: Button colors for the "stats" section (Projects, Likes, Comments) */
+      --btn-stat-bg: rgba(255, 255, 255, 0.2);
+      --btn-stat-border: 1px solid rgba(255, 255, 255, 0.4);
+      --btn-stat-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      --btn-stat-hover-bg: rgba(255, 255, 255, 0.3);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--body-bg-gradient); /* Will be replaced by your Catbox link */
+      color: var(--text-dark); 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      position: relative; 
+      overflow-x: hidden;
+      background-attachment: fixed;
+      background-size: cover; /* Ensure background covers the entire page */
+      background-position: center;
+      transition: background-image 0.5s ease-in-out; /* Smooth transition for background */
+    }
+
+    .app-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ======================================= */
+    /* ✅ NEW: Main Liquid Glass Card Container */
+    /* ======================================= */
+    .glass-card {
+      background: var(--glass-card-bg); 
+      border: var(--glass-card-border); 
+      padding: 24px;
+      border-radius: var(--glass-card-radius); 
+      width: 100%;
+      box-shadow: var(--glass-card-shadow); 
+      position: relative;
+      overflow: hidden; 
+      text-align: center;
+      backdrop-filter: blur(var(--glass-card-blur)); /* Apply blur directly to the card */
+      -webkit-backdrop-filter: blur(var(--glass-card-blur));
+      display: flex; /* Flexbox for internal layout */
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    /* ======================================= */
+    /* ANIMASI LIQUID GLASS SHINE (Inside the card) */
+    /* ======================================= */
+    @keyframes liquid-shine {
+      0% { transform: translateX(-150%) skewX(-30deg); }
+      100% { transform: translateX(150%) skewX(-30deg); }
+    }
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%; 
+      height: 100%;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
+      filter: blur(5px); 
+      z-index: 1;
+      animation: liquid-shine 3s linear 1s infinite;
+    }
+    .glass-card > * {
+      position: relative;
+      z-index: 2;
+    }
+    /* ======================================= */
+
+    /* ✅ NEW: Avatar Image */
+    .profile-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--primary-blue);
+      box-shadow: 0 0 15px rgba(0, 122, 255, 0.3);
+      margin-bottom: 20px;
+      background-color: rgba(255, 255, 255, 0.6); /* Fallback */
+    }
+    
+    .profile-username {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 22px; /* Slightly smaller for card */
+      color: var(--text-dark); /* Changed to dark text */
+      margin-bottom: 8px;
+    }
+    .profile-details {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 25px; /* Spacing below description */
+      max-width: 85%;
+      line-height: 1.5;
+    }
+
+    /* ✅ NEW: Input Field Styling */
+    input[type="text"], input[type="password"] { 
+      width: 100%; 
+      padding: 14px 18px; 
+      border-radius: 12px; /* Slightly more rounded */
+      background: var(--input-bg); 
+      border: var(--input-border); 
+      color: var(--text-dark); 
+      margin-bottom: 15px; /* Adjusted margin for closer fields */
+      font-size: 16px; 
+      font-family: 'Montserrat', sans-serif; 
+      outline: none; 
+      transition: border-color 0.3s ease, box-shadow 0.3s ease; 
+    }
+
+    input::placeholder { color: var(--text-light); } 
+
+    input:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 15px rgba(0, 122, 255, 0.5); 
+    }
+
+    /* ✅ NEW: Login Button Styling (similar to "Contact me" in example) */
+    .login-button { 
+      background: var(--primary-gradient); 
+      color: #fff; 
+      padding: 16px; /* Slightly less padding */
+      width: 100%; 
+      border-radius: 12px; /* Consistent with inputs */
+      font-weight: bold; 
+      border: none; 
+      margin-top: 15px; /* Space above button */
+      cursor: pointer; 
+      font-size: 18px; 
+      letter-spacing: 0.5px; /* Tighter letter spacing */
+      transition: 0.3s ease, box-shadow 0.3s ease; 
+      box-shadow: 0 6px 20px rgba(0, 122, 255, 0.3); /* Softer shadow */
+      display: flex; /* Flex for icon and text */
+      align-items: center;
+      justify-content: center;
+      gap: 10px; /* Space between icon and text */
+    }
+    
+    .login-button:hover { 
+      background: var(--primary-gradient-hover); 
+      box-shadow: 0 8px 25px rgba(0, 122, 255, 0.5); 
+      transform: translateY(-2px); /* Slight lift on hover */
+    }
+
+    /* ✅ NEW: Video Container for Login Success */
+    .video-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(245, 247, 250, 0.9); /* Lighter, more opaque glass overlay */
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(15px); /* More blur for the overlay */
+      -webkit-backdrop-filter: blur(15px);
+    }
+    .video-container.active { display: flex; }
+
+    .video-wrapper {
+      width: 90%; /* Slightly wider */
+      max-width: 600px; /* Max width for video */
+      position: relative;
+      border-radius: 20px; /* More rounded */
+      overflow: hidden;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3); /* Stronger shadow for pop-up video */
+      border: 1px solid rgba(255, 255, 255, 0.5); /* Clearer border */
+    }
+    .video-player {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 20px;
+    }
+    
+  </style>
+</head>
+<body>
+  
+  <div class="video-container" id="videoContainer">
+    <div class="video-wrapper">
+      <video class="video-player" id="loginVideo">
+        <source src="https://files.catbox.moe/bx19h1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  </div>
+  
+  <div class="app-wrapper">
+    
+    <div class="glass-card">
+        
+        <img src="https://files.catbox.moe/arpz45.png" alt="Profile Avatar" class="profile-avatar" />
+        
+        <div class="profile-username">Venom Cursed</div>
+        <div class="profile-details">
+          Please enter your credentials to access the dashboard. <br>
+          Contact telegram <span style="color:var(--primary-blue); font-weight:600;">@GaxIsHere25</span> jika belum memiliki akses.
+        </div>
+
+        <form method="POST" action="/auth" id="loginForm" style="width: 100%;">
+            <input type="text" name="username" placeholder="Username" required />
+            <input type="password" name="key" placeholder="Password" required />
+
+            <button type="submit" class="login-button">
+              <i class="fas fa-sign-in-alt"></i> LOGIN
+            </button>
+        </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loginForm = document.getElementById('loginForm');
+      const videoContainer = document.getElementById('videoContainer');
+      const loginVideo = document.getElementById('loginVideo');
+      
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = this;
+        showSuccessVideo();
+        loginVideo.addEventListener('ended', () => form.submit(), { once: true });
+      });
+
+      function showSuccessVideo() {
+        videoContainer.classList.add('active');
+        loginVideo.play().catch(() => {
+            // Fallback if video fails to play (e.g., autoplay restrictions)
+            console.warn("Video autoplay failed, proceeding with form submission.");
+            loginForm.submit();
+        });
+      }
+      
+      // ✅ NEW: Function to set background image (for your Catbox link)
+      function setBackground(imageUrl) {
+          document.body.style.backgroundImage = `url('${imageUrl}')`;
+      }
+
+      // ✅ Call this function with your Catbox link here
+      // Contoh: setBackground('https://files.catbox.moe/your_image.jpg');
+      // Untuk saat ini, saya pakai gradien default dari CSS.
+      // Anda bisa ganti ini:
+      setBackground('https://files.catbox.moe/hauux2.jpg'); // Contoh: Ganti dengan link Anda
+    });
+  </script>
+</body>
+</html>                                     
